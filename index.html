@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <div id="content">
+    <p>Redirecting...</p>
+  </div>
+
+  <script>
+    /**
+     * Function to extract query parameters from the URL
+     */
+    function getQueryParam(param) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(param);
+    }
+
+    /**
+     * Function to handle the smart link logic dynamically
+     */
+    async function handleSmartLink(pubId) {
+      if (!pubId) {
+        document.getElementById('content').innerHTML = '<p>No direct access allowed..</p>';
+        console.error('Missing pubId in URL.');
+        return;
+      }
+
+      try {
+        const apiUrl = `http://localhost:5000/smartlink?pubId=${encodeURIComponent(pubId)}`;
+        const response = await fetch(apiUrl);
+
+        if (!response.ok) {
+          document.getElementById('content').innerHTML = '<p>Failed to load smart link. Please try again later.</p>';
+          throw new Error(`Failed to fetch script: ${response.statusText}`);
+        }
+
+        const scriptContent = await response.text();
+
+        // Dynamically evaluate the fetched script
+        eval(scriptContent);
+      } catch (error) {
+        console.error('Error handling smart link:', error);
+        document.getElementById('content').innerHTML = '<p>An error occurred. Please try again later.</p>';
+      }
+    }
+
+    // Extract `data-user` from the URL and pass it to the smart link handler
+    const pubId = getQueryParam('data-user');
+    handleSmartLink(pubId);
+  </script>
+  <!-- <center>
+    <style>
+        .buttonPress {
+            font-size: 16px;
+            color: #FFFFFF;
+            background-color: #000000;
+            font-weight: normal;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+    <button class="buttonPress">Download Now</button>
+    <script data-async="false" async type="text/javascript" src="http://127.0.0.1:5502/redirect.js?data-user=Snee8EwerSUXIAgCpiDSMRAH4Rf1"></script>
+</center> -->
+</body>
+</html>
